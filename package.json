@@ -1,0 +1,36 @@
+{
+    "bin": {
+        "urx": "bin/urx.js"
+    },
+    "dependencies": {
+        "colors": "^1.1.2",
+        "commandos": "^0.1.6",
+        "htp": "^0.6.2",
+        "jinang": "^0.13.0",
+        "noda": "^0.3.0"
+    },
+    "devDependencies": {
+        "mocha": "^3.3.0"
+    },
+    "directories": {},
+    "scripts": {
+        "test": "mocha"
+    },
+    "name": "urx",
+    "version": "0.0.1",
+    "main": "index.js",
+    "keywords": [
+        "url-monitor"
+    ],
+    "homepage": "https://github.com/YounGoat/nodejs.urx",
+    "description": "URl eXaminer",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/YounGoat/nodejs.urx.git"
+    },
+    "author": {
+        "name": "YounGoat",
+        "email": "youngoat@163.com",
+        "url": "https://youngoat.github.io"
+    }
+}

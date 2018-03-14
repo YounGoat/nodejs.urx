@@ -1,0 +1,14 @@
+
+NAME
+    urx - Examine URLs in a markdown file.
+
+SYNOPSIS
+    urx [--file] <filename>
+    urx --help
+
+OPTIONS
+    --help
+    Display this help info.
+
+    --file <filename>
+    Path of markdown file.    
