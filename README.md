@@ -3,7 +3,7 @@ __URl eXaminer__
 
 ##  Description
 
-Verify the availability of URLs in supplied document. __urx__ will try to request the URLs one by one. By default, those responsed successfully with statusCode >= 200 and < 400 will be marked with check sign √ (U+221A) and followed with the statusCode, the others will be marked cross sign × (U+00D7) and followed with statusCode or error message if no response available. You may also customise requesting gestures and define expected responses, see [Customise Request and Response](#customise-request-and-response).
+Verify the availability of URLs in supplied document. __urx__ will try to request the URLs one by one. By default, those responsed successfully with statusCode >= 200 and < 400 will be marked with check sign √ (U+221A) and followed with the statusCode, the others will be marked cross sign × (U+00D7) and followed with statusCode or error message if no response available. You may also customise requesting gestures and define expected responses, see [API](#api) or [Supported Text Formatting](#supported-text-formatting).
 
 ##	ToC
 
@@ -107,4 +107,4 @@ http://302.example.com/
 http://10.0.0.1/
 ```
 
-Here is [an example of test case written in MarkDown](./example/bat.md).
+Here is [an example of test case written in MarkDown](./example/bat.md) (please read in Raw mode).
