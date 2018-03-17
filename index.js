@@ -6,21 +6,39 @@ const MODULE_REQUIRE = 1
     /* NPM */
     , htp = require('htp')
     , PoC = require('jinang/PoC')
+    , shadowing = require('shadowing')
     
     /* in-package */
+
+    /* in-file */
     ;
 
-function examine(urlname, callback) { return PoC(function(done) {
-    htp.get(urlname, (err, response) => {
+function examine(options, callback) { return PoC(function(done) {
+    if (typeof options == 'string') {
+        options = { url : options };
+    }
+    options = Object.assign({
+        request: {
+            headers: {},
+        },
+        response: {
+            statusCode: shadowing.numberRange('>=200 <400'),
+            headers: {},
+        },
+    }, options);
+
+    let urlname = options.url;
+    let headers = options.request.headers;
+    htp.get(urlname, headers, (err, response) => {
         if (err) {
-            done(err);
+            return done(err);
         }
-        else if (response.statusCode < 200 || response.statusCode >= 400) {
-            done(new Error(`unexpected status: ${response.statusCode}`), { response });
+        
+        if (!shadowing(response, options.response)) {
+            return done(new Error(`unexpected response`), { response });
         }
-        else {
-            done(null, { response });
-        }
+        
+        return done(null, { response });
     });
 }, callback); }; 
 
