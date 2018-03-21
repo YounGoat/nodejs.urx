@@ -12,7 +12,9 @@ const MODULE_REQUIRE = 1
 	, colors = require('colors')
 	, commandos = require('commandos')
 	, htp = require('htp')
+	, inof = require('jinang/inof')
 	, noda = require('noda')
+	, sogo = require('jinang/sogo')
 	, TxtFile = require('jinang/TxtFile')
 	
 	/* in-package */
@@ -39,7 +41,10 @@ const cmd = commandos.parse({
 	explicit: true,
     groups: [
         [ '--help -h REQUIRED' ],
-        [ '--file -f [0] NOT NULL REQUIRED' ],
+        [ 
+			'--file -f [0] NOT NULL REQUIRED',
+			'--verbose -v'
+		],
 	],
 	catcher: ex => {
 		// ...
@@ -114,9 +119,25 @@ const lineProcessors = [
 			let options = cloneObject(registry, [ 'request', 'response' ], true);
 
 			options.url = line;
+
+			if (cmd.verbose) {
+				let headers = sogo.get(options, 'request.headers');
+				headers && inof(headers, (name, value) => {
+					console.log(colors.yellow('>'), colors.dim(name) + ':', value)
+				});
+			}
+
 			urx(options, (err, ret) => {
 				let msg = ret && ret.response ? ret.response.statusCode : err.message;
-				let flag = err ? colors.bold.red('\u00d7') : colors.bold.green('\u221a');
+				let deco = err ? colors.red : colors.green;
+				let flag = deco.bold(err ? '\u00d7' : '\u221a');
+
+				if (cmd.verbose && ret.response) {
+					inof(ret.response.headers, (name, value) => {
+						console.log(deco('<'), colors.dim(name) + ':', value);
+					});
+				}
+				
 				console.log(flag, colors.italic(line), colors.dim(`[${msg}]`));
 				resolve(true);
 			});

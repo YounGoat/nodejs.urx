@@ -3,7 +3,7 @@ NAME
     urx - Examine URLs in a markdown file.
 
 SYNOPSIS
-    urx [--file] <filename>
+    urx [--file] <filename> [--verbose]
     urx --help
 
 OPTIONS
@@ -12,3 +12,6 @@ OPTIONS
 
     --file <filename>
     Path of markdown file.    
+
+    --verbose, -v
+    Display details of response or exception.

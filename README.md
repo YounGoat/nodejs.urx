@@ -57,12 +57,12 @@ urx(options)
 *   void __urx__(object *options*, Function *callback*)
 
 In argument *options*:
-*   string __options.url__
-*   object __options.request__ OPTIONAL
-*   object __options.request.headers__ OPTIONAL//
-*   object __options.response__ OPTIONAL
-*   number __options.response.statusCode__ OPTIONAL
-*   object __options.response.headers__ OPTIONAL
+*   __options.url__ *string* 
+*   __options.request__ *object* OPTIONAL
+*   __options.request.headers__ *object* OPTIONAL//
+*   __options.response__ *object* OPTIONAL
+*   __options.response.statusCode__ *number* OPTIONAL
+*   __options.response.headers__ *object* OPTIONAL
 
 *options.request* is used to customise the request. And *options.response* descibes the expected response.
 

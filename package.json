@@ -6,7 +6,7 @@
         "colors": "^1.1.2",
         "commandos": "^0.1.6",
         "htp": "^0.6.2",
-        "jinang": "^0.14.0",
+        "jinang": "^0.15.0",
         "noda": "^0.3.0",
         "shadowing": "^0.1.0"
     },
@@ -16,10 +16,10 @@
         "test": "mocha"
     },
     "name": "urx",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "main": "index.js",
     "keywords": [
-        "url-monitor"
+        "url-response-validator"
     ],
     "homepage": "https://github.com/YounGoat/nodejs.urx",
     "description": "URl eXaminer",
