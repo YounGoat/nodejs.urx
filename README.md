@@ -15,8 +15,6 @@ Verify the availability of URLs in supplied document. __urx__ will try to reques
 
 ##	Get Started
 
-
-
 ```bash
 # Install globally.
 npm install -g urx

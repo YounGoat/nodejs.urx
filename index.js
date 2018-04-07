@@ -13,6 +13,14 @@ const MODULE_REQUIRE = 1
     /* in-file */
     ;
 
+/**
+ * @param  {Object}    options
+ * @param  {string}    options - Regarded as URL to be examined, equaling to `options.url`.
+ * @param  {string}    options.url
+ * @param  {Object}    options.request
+ * @param  {Object}    options.response
+ * @param  {Function} [callback]
+ */
 function examine(options, callback) { return PoC(function(done) {
     if (typeof options == 'string') {
         options = { url : options };
@@ -34,7 +42,7 @@ function examine(options, callback) { return PoC(function(done) {
             return done(err);
         }
         
-        if (!shadowing(response, options.response)) {
+        if (!shadowing(response, options.response, 'loose')) {
             return done(new Error(`unexpected response`), { response });
         }
         

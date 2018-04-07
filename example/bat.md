@@ -1,5 +1,6 @@
 #   Baidu
 
+^.RESPONSE.bodyBuffer.length "80+/-10"  
 http://baidu.com/  
 ^.RESPONSE.statusCode 302  
 https://baidu.com/  

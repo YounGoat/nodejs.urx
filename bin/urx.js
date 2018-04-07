@@ -9,30 +9,21 @@ const MODULE_REQUIRE = 1
 	/* NPM */
 	, cloneObject = require('jinang/cloneObject')
 	, co = require('jinang/co')
+	, inof = require('jinang/inof')
+	, shorten = require('jinang/shorten')
+	, sogo = require('jinang/sogo')
+	, TxtFile = require('jinang/TxtFile')
+
 	, colors = require('colors')
 	, commandos = require('commandos')
 	, htp = require('htp')
-	, inof = require('jinang/inof')
 	, noda = require('noda')
-	, sogo = require('jinang/sogo')
-	, TxtFile = require('jinang/TxtFile')
 	
 	/* in-package */
 	, urx = noda.inRequire('index')
 
 	/* in-file */
 	, clearObject = obj => { for (let name in obj) delete obj[name]; }
-	, makeChainProperty = (obj, chainName, value) => {
-		let names = chainName.split('.');
-		let endname = names.pop();
-		let o = obj;
-		for (let i = 0, name; i < names.length; i++) {
-			name = names[i];
-			if (!o.hasOwnProperty(name)) o[name] = {};
-			o = o[name];
-		}
-		o[endname] = value;
-	}
 	;
 
 const help = () => console.log(noda.inRead('help.txt', 'utf8'));
@@ -43,7 +34,8 @@ const cmd = commandos.parse({
         [ '--help -h REQUIRED' ],
         [ 
 			'--file -f [0] NOT NULL REQUIRED',
-			'--verbose -v'
+			'--verbose -v',
+			'--longurl NOT NULL',
 		],
 	],
 	catcher: ex => {
@@ -70,28 +62,57 @@ const lineProcessors = [
 		return matched;
 	},
 
+	// ///
+	function comment(line, registry) {
+		let matched = /^\/{3}/.test(line);
+		return matched;
+	},
+
+	// ^.GROUP
 	// ^.IGNORE
-	function IGNORE(line, registry) {
-		let matched = /^\^\.((IGNORE)(\.(START|END))?)\s*$/i.test(line);
+	function command(line, registry) {
+		let matched = /^\^\.((GROUP|IGNORE)(\.(START|END))?)\s*$/i.test(line);
 		if (matched) {
 			let command = RegExp.$2.toUpperCase();
 			let action = RegExp.$4.toUpperCase();
-			if (command == 'IGNORE') {
-				registry.ignore = (action == 'END') ? false : true;
+			switch (command) {
+				case 'GROUP':
+					registry.group = (action == 'END') ? false : true;
+					// On GROUP.END, delete the REQUEST and RESPONSE settings.
+					if (!registry.group) {
+						delete registry.request;
+						delete registry.response;
+					}
+					break;
+					
+				case 'IGNORE':
+					registry.ignore = (action == 'END') ? false : true;
+					break;
 			}
 		}
 		return matched;
 	},
+
+	// function configResponseSize(line, registry) {
+	// 	let matched = /^\^\.RESPONSE.bodyBuffer.length\s+(.+)$/.test(line);
+	// 	if (matched) {
+	// 		let data = RegExp.$1;
+	// 		sogo.set(registry, 'response.bodyBuffer.length', shadowing.numberRange(data));
+	// 	}
+	// 	return matched;
+	// },
 
 	// ^.REQUEST
 	// ^.RESPONSE
 	function config(line, registry) {
 		let matched = /^\^\.((REQUEST|RESPONSE)(\.[^\s]+)?)\s+(.+)$/.test(line);
 		if (matched) {
+			// REQUEST | RESPONSE
 			let name = RegExp.$2.toLowerCase() + RegExp.$3;
+
 			let data = RegExp.$4;
 			let json = JSON.parse(data);
-			makeChainProperty(registry, name, json);
+			sogo.set(registry, name, json);
 		}
 		return matched;
 	},
@@ -116,7 +137,7 @@ const lineProcessors = [
 
 			// The last argument `true` indicates to remove cloned properties 
 			// from the original object `registry`.
-			let options = cloneObject(registry, [ 'request', 'response' ], true);
+			let options = cloneObject(registry, [ 'request', 'response' ], !registry.group);
 
 			options.url = line;
 
@@ -128,17 +149,26 @@ const lineProcessors = [
 			}
 
 			urx(options, (err, ret) => {
-				let msg = ret && ret.response ? ret.response.statusCode : err.message;
+				let response = ret && ret.response;
+				let msg = response 
+					? `HTTP/${response.httpVersion} ${response.statusCode} ${response.bodyBuffer.length}B`
+					: err.message
+					;
 				let deco = err ? colors.red : colors.green;
 				let flag = deco.bold(err ? '\u00d7' : '\u221a');
 
-				if (cmd.verbose && ret.response) {
-					inof(ret.response.headers, (name, value) => {
+				if (cmd.verbose && response) {
+					inof(response.headers, (name, value) => {
 						console.log(deco('<'), colors.dim(name) + ':', value);
 					});
 				}
 				
-				console.log(flag, colors.italic(line), colors.dim(`[${msg}]`));
+				let urlname = options.url;
+				if (cmd.longurl) {
+					urlname = shorten(urlname, 80, cmd.longurl);
+				}
+
+				console.log(flag, colors.italic(urlname), colors.dim(`[${msg}]`));
 				resolve(true);
 			});
 		});
@@ -174,5 +204,7 @@ else {
 				else throw new Error(`unexpected processor response: ${ret}`);
 			}
 		}
-	}).catch(ex => console.log(ex));
+	}).catch(ex => {
+		console.log(cmd.verbose ? ex : ex.message);
+	});
 }

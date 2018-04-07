@@ -3,7 +3,7 @@ NAME
     urx - Examine URLs in a markdown file.
 
 SYNOPSIS
-    urx [--file] <filename> [--verbose]
+    urx [--file] <filename> [--longurl <style>] [--verbose]
     urx --help
 
 OPTIONS
@@ -12,6 +12,17 @@ OPTIONS
 
     --file <filename>
     Path of markdown file.    
+
+    --longurl <style>
+    What to do when URL is too long.
+    The style is one of
+        "keephead"
+        "keeptail"
+        "keepbody"
+        "keepends"
+        "cuthead"
+        "cuttail"
+        "cutends"
 
     --verbose, -v
     Display details of response or exception.
