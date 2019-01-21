@@ -16,6 +16,9 @@ http://tmall.com/
 
 #   Tencent
 
+^.GROUP.START
+^.RESPONSE.statusCode 200
 http://tencent.com/  
 http://qq.com/  
 http://weixin.com/  
+^.GROUP.END

@@ -5,6 +5,7 @@ const MODULE_REQUIRE = 1
     
     /* NPM */
     , htp = require('htp')
+    , if2 = require('if2')
     , PoC = require('jinang/PoC')
     , shadowing = require('shadowing')
     
@@ -19,6 +20,7 @@ const MODULE_REQUIRE = 1
  * @param  {string}    options.url
  * @param  {Object}    options.request
  * @param  {Object}    options.response
+ * @param  {object}   [options.agent]
  * @param  {Function} [callback]
  */
 function examine(options, callback) { return PoC(function(done) {
@@ -37,8 +39,9 @@ function examine(options, callback) { return PoC(function(done) {
 
     let urlname = options.url;
     let headers = options.request.headers;
-    htp.get(urlname, headers, (err, response) => {
+    if2(options.agent, htp).get(urlname, headers, (err, response) => {
         if (err) {
+            console.log(err);
             return done(err);
         }
         

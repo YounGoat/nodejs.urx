@@ -3,14 +3,17 @@ NAME
     urx - Examine URLs in a markdown file.
 
 SYNOPSIS
-    urx [--file] <filename> [--longurl <style>] [--verbose]
+    urx [--file] <filename> [--proxy <proxy>] [--longurl <style>] [--verbose] [--display-body]
     urx --help
 
 OPTIONS
     --help
     Display this help info.
 
-    --file <filename>
+    --display-body | -b
+    Display response body.
+
+    --file | -f <filename>
     Path of markdown file.    
 
     --longurl <style>
@@ -23,6 +26,9 @@ OPTIONS
         "cuthead"
         "cuttail"
         "cutends"
+
+    --proxy <proxy>
+    Proxy, e.g. http://127.0.0.1:8080
 
     --verbose, -v
     Display details of response or exception.

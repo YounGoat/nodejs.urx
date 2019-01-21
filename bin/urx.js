@@ -9,6 +9,7 @@ const MODULE_REQUIRE = 1
 	/* NPM */
 	, cloneObject = require('jinang/cloneObject')
 	, co = require('jinang/co')
+	, if2 = require('if2')
 	, inof = require('jinang/inof')
 	, shorten = require('jinang/shorten')
 	, sogo = require('jinang/sogo')
@@ -34,6 +35,8 @@ const cmd = commandos.parse({
         [ '--help -h REQUIRED' ],
         [ 
 			'--file -f [0] NOT NULL REQUIRED',
+			'--display-body -b',
+			'--proxy NOT NULL',
 			'--verbose -v',
 			'--longurl NOT NULL',
 		],
@@ -47,14 +50,28 @@ const cmd = commandos.parse({
 const lineProcessors = [
 
 	// # title
-	function title(line, registry) {
-		let matched = line.startsWith('#');
-		if (matched) {
-			let title = line.replace(/^#+\s*/, '');
-			console.log(colors.cyan.bold(title));
+	(function() {
+		let nums = [];
+
+		return function title(line, registry) {
+			let matched = line.startsWith('#');
+			if (matched) {
+				let title = line.replace(/^(#+)\s*/, '');
+				let sharpCount = RegExp.$1.length;
+
+				if (nums.length < sharpCount) {
+					nums = nums.concat(new Array(sharpCount - nums.length).fill(1));
+				}
+				else {
+					nums = nums.slice(0, sharpCount);
+					nums[ nums.length - 1 ]++;
+				}
+
+				console.log(colors.cyan.bold(nums.join('.') + ' ' + title));
+			}
+			return matched;
 		}
-		return matched;
-	},
+	}()),
 
 	// <!-- ... -->
 	function comment(line, registry) {
@@ -139,7 +156,16 @@ const lineProcessors = [
 			// from the original object `registry`.
 			let options = cloneObject(registry, [ 'request', 'response' ], !registry.group);
 
-			options.url = line;
+			PROXY: {
+				let proxy = cmd.proxy;
+				if (proxy) {
+					options.agent = htp({ proxy });
+				}
+			}
+
+			options.url = line.replace(/\$\{([^}]+)\}/g, n => {
+				return eval(RegExp.$1);
+			});
 
 			if (cmd.verbose) {
 				let headers = sogo.get(options, 'request.headers');
@@ -158,6 +184,10 @@ const lineProcessors = [
 				let flag = deco.bold(err ? '\u00d7' : '\u221a');
 
 				if (cmd.verbose && response) {
+					// Display network info.
+					console.log(deco('='), colors.dim('Remote Address') + ':', response.network.remoteAddress + ':' + response.network.remotePort);
+
+					// Display response headers.
 					inof(response.headers, (name, value) => {
 						console.log(deco('<'), colors.dim(name) + ':', value);
 					});
@@ -169,6 +199,12 @@ const lineProcessors = [
 				}
 
 				console.log(flag, colors.italic(urlname), colors.dim(`[${msg}]`));
+
+				if (cmd['display-body'] && response && response.body) {
+					let lines = response.body.split(/[\r\n]+/);
+					lines.forEach(line => console.log(deco('$'), line));
+				}
+
 				resolve(true);
 			});
 		});
@@ -192,6 +228,7 @@ else {
 		console.error(`file not found: ${cmd.file}`);
 		return;
 	}
+
 	let md = new TxtFile(cmd.file);
 
 	co.easy(function*() {

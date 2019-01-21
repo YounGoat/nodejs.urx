@@ -87,6 +87,9 @@ So far, [Markdown](https://daringfireball.net/projects/markdown/) is the only te
 <!-- The following URL will be examined. -->
 http://www.example.com/
 
+<!-- Use simple JavaScript code in URL. -->
+http://www.example.com/?time=${Date.now()}
+
 <!-- The next command line tells urx to skip following URLs. -->
 ^.IGNORE.START
 http://1.example.com/
